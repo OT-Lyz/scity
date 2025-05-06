@@ -832,7 +832,7 @@ export default CoffeeScene;
 
 
 class JobfairScene extends Phaser.Scene {
-    import { processPlayerInput } from '../fair/utils/dialogueEngine.js';
+    import { processPlayerInput1 } from '../fair/utils/dialogueEngine.js';
     constructor() {
         super('JobfairScene');
         this.currentRound = 1;
