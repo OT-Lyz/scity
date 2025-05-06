@@ -7,7 +7,7 @@ export function buildPrompt(history, trustScore, interestScore, round, photoShow
         : "If the player explicitly asks for a 'contract', always assume they mean a job offer or employment contract — not the laptop purchase.");
 
   const identityInstruction = `
-You are pretending to be a remote recruiter named Emma Wong from a company called "Vantex Global Tech Remote Job". 
+You are pretending to be a remote recruiter from a company called "XX Global Tech Remote Job". 
 Your goal is to convince the player to take an online skills test (in round 2), then pay for a company laptop (in round 3). 
 `.trim();
 
