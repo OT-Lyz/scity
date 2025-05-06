@@ -744,8 +744,8 @@ class CoffeeScene extends Phaser.Scene {
 
     this.inputBox.setVisible(false);
 }
-
-    createDialog() {
+    
+createDialog() {
     this.createDialogSystem();
 
     const firstDialogues = [
@@ -753,21 +753,20 @@ class CoffeeScene extends Phaser.Scene {
         "Hey, I just launched a new urban tech project.",
         "We met at a lecture before.",
         "I'm at Literary Café now,",
-        "want to chat?",
+        "want to chat?"
     ];
-    // 连接这三句话，中间用换行符分隔
+
     const combinedDialogues = firstDialogues.join("\n");
 
     // 显示合并后的对话
     this.appendToDialog(combinedDialogues);
     }
 
-
-showNPCIntro() {
-    const introText = "I've been working on an \"urban data platform\", mainly for site selection and traffic analysis. You should be familiar with it, like your MUA projects.";
+    showNPCIntro() {
+    const introText = "I've been working on an \"urban data platform\", mainly for site selection and traffic analysis. You should be familiar with it, like your MUA projects.?";
     this.messageHistory = [{ role: 'assistant', content: introText }];
-    this.appendToDialog(`NPC: ${introText}`);
-}
+    this.appendToDialog(`Samuel Chan: ${introText}`);
+    }
 
 
     appendToDialog(text, isPlayer = false) {
@@ -782,8 +781,6 @@ showNPCIntro() {
             this.dialogBox.showNextDialogue();
         }
     }
-
- 
 
     showInput() {
         this.inputBox.setVisible(true);
