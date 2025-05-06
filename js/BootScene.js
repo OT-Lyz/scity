@@ -895,7 +895,12 @@ class JobfairScene extends Phaser.Scene {
     // 显示合并后的对话
     this.appendToDialog(combinedDialogues);
     }
-    
+
+    showNPCIntro() {
+    const introText = "I've been working on an \"urban data platform\", mainly for site selection and traffic analysis. You should be familiar with it, like your MUA projects.";
+    this.messageHistory = [{ role: 'assistant', content: introText }];
+    this.appendToDialog(`Recruiter: ${introText}`);
+    }
 
     appendToDialog(text, isPlayer = false) {
         if (!this.dialogBox) {
