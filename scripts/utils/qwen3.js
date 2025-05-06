@@ -1,6 +1,6 @@
 import { API_KEY, API_URL } from '../config.js';
 
-const MODEL_NAME = 'qwen-turbo-latest';  // 你可以改为 qwen-turbo 或其他模型
+const MODEL_NAME = 'qwen-plus-latest';  // 你可以改为 qwen-turbo 或其他模型
 const MAX_CONTEXT = 4096;
 const MIN_TOKENS = 256;
 
