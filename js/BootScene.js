@@ -717,7 +717,8 @@ class CoffeeScene extends Phaser.Scene {
         const scaleFactor = Math.min(scaleX, scaleY);
         coffeeImage.setScale(scaleFactor);
 
-        this.createDialogSystem();
+        
+        this.createDialog();
         this.showNPCIntro();
     }
 
@@ -763,7 +764,7 @@ createDialog() {
     }
 
     showNPCIntro() {
-    const introText = "I've been working on an \"urban data platform\", mainly for site selection and traffic analysis. You should be familiar with it, like your MUA projects.?";
+    const introText = "I've been working on an \"urban data platform\", mainly for site selection and traffic analysis. You should be familiar with it, like your MUA projects.";
     this.messageHistory = [{ role: 'assistant', content: introText }];
     this.appendToDialog(`Samuel Chan: ${introText}`);
     }
