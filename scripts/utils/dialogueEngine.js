@@ -1,5 +1,5 @@
 import { buildPrompt } from '../prompt.js'; 
-import { getAIResponse } from './deepseek.js';
+import { getAIResponse } from './qwen3.js';
 
 export async function processPlayerInput(text, round, photoShown, messageHistory) {
   messageHistory.push({ role: 'user', content: text });
