@@ -678,8 +678,8 @@ class MapScene extends Phaser.Scene {
     
 }
 
-import { processPlayerInput } from '../scripts/utils/dialogueEngine.js';
 class CoffeeScene extends Phaser.Scene {
+    import { processPlayerInput } from '../scripts/utils/dialogueEngine.js';
     constructor() {
         super('CoffeeScene');
         this.currentRound = 1;
@@ -832,6 +832,7 @@ export default CoffeeScene;
 
 
 class JobfairScene extends Phaser.Scene {
+    import { processPlayerInput } from '../fair/utils/dialogueEngine.js';
     constructor() {
         super('JobfairScene');
         this.currentRound = 1;
