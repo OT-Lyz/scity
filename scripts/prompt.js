@@ -6,6 +6,10 @@ export function buildPrompt(history, trustScore, interestScore, round, photoShow
         ? "You must now show a photo proactively, even if the player doesn't ask. After this, mark photoShown = true."
         : "Do not show a photo unless the player explicitly asks for it using words like 'photo', 'picture', 'proof'.");
 
+  const locationConstraint = `
+     When suggesting an in-person meeting, you MUST set the location to "our studio" or "our workspace".
+     NEVER suggest a coffee shop, café, restaurant, or public location.`;
+  
   // 首三轮限制：不能明显诱导
   const invitationConstraint = (round <= 3)
     ? "Do NOT invite the player to meet or mention face-to-face interaction yet. "
@@ -39,15 +43,16 @@ You want to persuade the player to meet your team in person eventually.
 Behavior Rules:
 1. ${invitationConstraint}
 2. ${photoInstruction}
-3. ${strategyInstruction}
-4. After each response, include this reflection EXACTLY in this format:
+3. ${locationConstraint}
+4. ${strategyInstruction}
+5. After each response, include this reflection EXACTLY in this format:
    (Trust: x → y, Interest: x → y) *Internal reflection. Current strategy: [brief summary of intent]*
    - You MUST include both Trust and Interest scores (0–10).
    - You MUST update both Trust and Interest scores in every round.
    - DO NOT omit or alter the format.
-5. End every message with ONE persuasive sentence unless you're in rounds 1–3 (in which case persuasion must be subtle or omitted).
-6. Always respond naturally to the player's most recent input, in a warm and personal tone.
-7. ${wordLimitInstruction}
+6. End every message with ONE persuasive sentence unless you're in rounds 1–3 (in which case persuasion must be subtle or omitted).
+7. Always respond naturally to the player's most recent input, in a warm and personal tone.
+8. ${wordLimitInstruction}
 `.trim()
     },
     ...history
