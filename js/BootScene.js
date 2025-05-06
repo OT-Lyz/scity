@@ -924,7 +924,7 @@ class JobfairScene extends Phaser.Scene {
         const { formalText, trustScore, interestScore, strategy, photoShown } =
             await processPlayerInputJobfair(text, this.currentRound, this.photoShown, this.messageHistory);
 
-        this.appendToDialog(`NPC: ${formalText}`);
+        this.appendToDialog(`Recruiter: ${formalText}`);
         this.updateGameState(trustScore, interestScore, strategy);
 
         if (++this.currentRound > this.maxRounds) {
