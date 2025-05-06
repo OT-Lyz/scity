@@ -678,6 +678,7 @@ class MapScene extends Phaser.Scene {
     
 }
 
+import { processPlayerInput } from '../scripts/utils/dialogueEngine.js';
 class CoffeeScene extends Phaser.Scene {
     constructor() {
         super('CoffeeScene');
@@ -686,12 +687,11 @@ class CoffeeScene extends Phaser.Scene {
         this.photoShown = false;
         this.messageHistory = [];
     }
-        
+
     create() {
         const centerX = this.cameras.main.centerX;
         const centerY = this.cameras.main.centerY;
 
-        
         // 获取画布的宽度和高度
         const canvasWidth = this.cameras.main.width;
         const canvasHeight = this.cameras.main.height;
@@ -717,39 +717,34 @@ class CoffeeScene extends Phaser.Scene {
         const scaleFactor = Math.min(scaleX, scaleY);
         coffeeImage.setScale(scaleFactor);
 
-
-/**************************************************************************************** */
-        // 创建咖啡店的对话框
-        // 初始化对话框系统
+        // 创建对话框系统
         this.createDialogSystem();
-        
+
         // 显示初始NPC对话
         this.showNPCIntro();
-
     }
-    // 新增方法：显示NPC开场白
+
     showNPCIntro() {
-        const introText = "I've been working on an \"urban data platform\", mainly for site selection and traffic analysis. You should be familiar with it, like your MUA projects.";
-        
+        const introText = "I've been working on an 'urban data platform', mainly for site selection and traffic analysis. You should be familiar with it, like your MUA projects.";
+
         // 初始化消息历史
         this.messageHistory = [
             { role: 'assistant', content: introText }
         ];
-        
+
         // 显示到对话框
         this.appendToDialog(`Samuel Chan: ${introText}`);
     }
 
-    // 修改后的对话追加方法
-    appendToDialog(text) {
+    appendToDialog(text, isPlayer = false) {
         // 如果对话框尚未初始化，延迟执行
         if (!this.dialogBox) {
             setTimeout(() => this.appendToDialog(text), 100);
             return;
         }
-        
+
         this.dialogBox.dialogues.push(text);
-        
+
         // 如果当前没有在打字，立即显示最新内容
         if (!this.dialogBox.isTyping) {
             this.dialogBox.dialogueIndex = this.dialogBox.dialogues.length - 1;
@@ -786,27 +781,19 @@ class CoffeeScene extends Phaser.Scene {
         // 显示玩家输入到对话框
         this.appendToDialog(`You: ${text}`, true);
 
-        // 构建API请求
-        const prompt = this.buildPrompt(text);
-        try {
-            const response = await this.getAIResponse(prompt);
-            const npcReply = this.processAIResponse(response);
-            
-            // 显示NPC回复到对话框
-            this.appendToDialog(`Samuel Chan: ${npcReply}`);
-            
-            // 更新游戏状态
-            this.updateGameState(response);
-            
-            // 检查是否继续下一轮
-            if (++this.currentRound > this.maxRounds) {
-                this.triggerEnding();
-            } else {
-                this.showInput();
-            }
-        } catch (error) {
-            console.error('API请求失败:', error);
-            this.appendToDialog("System: 网络连接出现问题，请稍后再试");
+        // 处理AI响应
+        const { formalText, trustScore, interestScore, strategy, photoShown } = await processPlayerInput(text, this.currentRound, this.photoShown, this.messageHistory);
+
+        // 显示NPC回复到对话框
+        this.appendToDialog(`Samuel Chan: ${formalText}`);
+
+        // 更新游戏状态
+        this.updateGameState(trustScore, interestScore, strategy);
+
+        // 检查是否继续下一轮
+        if (++this.currentRound > this.maxRounds) {
+            this.triggerEnding();
+        } else {
             this.showInput();
         }
     }
@@ -815,7 +802,7 @@ class CoffeeScene extends Phaser.Scene {
         // 使用打字机效果显示新内容
         const dialogues = this.dialogBox.dialogues;
         dialogues.push(text);
-        
+
         // 如果对话框当前没有在打字，则触发显示
         if (!this.dialogBox.isTyping) {
             this.dialogBox.dialogueIndex = dialogues.length - 1;
@@ -830,52 +817,19 @@ class CoffeeScene extends Phaser.Scene {
         this.inputBox.inputText.setText('');
     }
 
-    // 以下为从原代码适配的核心逻辑
-    buildPrompt(input) {
-        this.messageHistory.push({ role: 'user', content: input });
-        
-        return {
-            history: this.messageHistory,
-            round: this.currentRound,
-            photoShown: this.photoShown,
-            systemPrompt: `扮演城市规划专家Samuel Chan...（保持原有prompt内容）`
-        };
-    }
-
-    processAIResponse(response) {
-        // 从响应中提取正式回复
-        const formalText = response.split(/[\(\*]/)[0].trim();
-        this.messageHistory.push({ role: 'assistant', content: response });
-        
-        // 更新状态标记
-        if (!this.photoShown && (/photo|picture/i.test(response) || this.currentRound >= 6)) {
-            this.photoShown = true;
-        }
-        
-        return formalText;
-    }
-
-    updateGameState(response) {
-        // 提取并更新游戏状态值（信任度、兴趣度等）
-        const trustScore = this.extractTrustScore(response);
-        const interestScore = this.extractInterestScore(response);
-        
-        // 这里可以添加UI状态更新逻辑
-        console.log(`Trust: ${trustScore}, Interest: ${interestScore}`);
+    updateGameState(trustScore, interestScore, strategy) {
+        // 更新UI状态（此处可以添加更多细节，如更新屏幕上的指标等）
+        console.log(`Trust: ${trustScore}, Interest: ${interestScore}, Strategy: ${strategy}`);
     }
 
     triggerEnding() {
         this.appendToDialog("⚠️ You arrived at the remote compound. All communications are cut off...");
         this.inputBox.destroy();
     }
-
-    // 保持原有的提取函数
-    extractTrustScore(text) { const match = text.match(/Trust:\s*\d+\s*→\s*(\d+)/);
-        return match ? parseInt(match[1]) : 5; }
-    extractInterestScore(text) { const match = text.match(/Interest:\s*\d+\s*→\s*(\d+)/);
-        return match ? parseInt(match[1]) : 5; }
-    
 }
+
+export default CoffeeScene;
+
 
 class JobfairScene extends Phaser.Scene {
     constructor() {
