@@ -839,13 +839,11 @@ class JobfairScene extends Phaser.Scene {
         this.photoShown = false;
         this.messageHistory = [];
     }
-        
+
     create() {
         const centerX = this.cameras.main.centerX;
         const centerY = this.cameras.main.centerY;
 
-        
-        // 获取画布的宽度和高度
         const canvasWidth = this.cameras.main.width;
         const canvasHeight = this.cameras.main.height;
 
@@ -870,94 +868,88 @@ class JobfairScene extends Phaser.Scene {
         const scaleFactor = Math.min(scaleX, scaleY);
         JobfairImage.setScale(scaleFactor);
 
-
-        // 初始化对话框
+        // 初始化对话
         this.createDialog();
         this.showNPCIntro();
     }
-   
+
     createDialogSystem() {
-    const screenWidth = this.cameras.main.width;
-    const screenHeight = this.cameras.main.height;
+        const screenWidth = this.cameras.main.width;
+        const screenHeight = this.cameras.main.height;
 
-    // 创建对话框（位置根据需求调整）
-    this.dialogBox = new DialogBox(this, {
-        x: screenWidth * 0.025,  // 调整为和原来一致
-        y: screenHeight - 170,    // 调整为和原来一致
-        width: screenWidth * 0.95, // 调整为和原来一致
-        height: 150,               // 高度保持不变
-        portraitKey: 'npc_jobfair_smile',
-        dialogues: [],             // 初始为空，动态添加内容
-        onComplete: () => this.showInput()
-    });
+        // 创建对话框
+        this.dialogBox = new DialogBox(this, {
+            x: screenWidth * 0.025,
+            y: screenHeight - 170,
+            width: screenWidth * 0.95,
+            height: 150,
+            portraitKey: 'npc_jobfair_smile',
+            dialogues: [],
+            onComplete: () => this.showInput()
+        });
 
-    // 创建输入框（初始隐藏）
-    this.inputBox = new InputBox(this, {
-        x: screenWidth * 0.025,   // 调整为和原来一致
-        y: screenHeight - 200,    // 调整为和原来一致
-        width: screenWidth * 0.95, // 调整为和原来一致
-        onSubmit: text => this.handlePlayerInput(text)
-    });
-    this.inputBox.setVisible(false);
+        // 创建输入框（初始隐藏）
+        this.inputBox = new InputBox(this, {
+            x: screenWidth * 0.025,
+            y: screenHeight - 200,
+            width: screenWidth * 0.95,
+            onSubmit: text => this.handlePlayerInput(text)
+        });
+        this.inputBox.setVisible(false);
     }
 
+    createDialog() {
+        this.createDialogSystem();
 
-        // 第一段对话内容
         const firstDialogues = [
             "You arrive at a large job fair in the city.",
             "There are several booths.",
             "Would you like to take a look?"
         ];
-        
-        // 将对话添加到对话框
+
         firstDialogues.forEach(dialogue => this.appendToDialog(dialogue));
     }
 
     showNPCIntro() {
         const introText = "Hello, we are Vantex Global Tech Remote Job, offering remote jobs with 8000 gold per month. Interested?";
 
-        // 初始化消息历史
         this.messageHistory = [
             { role: 'assistant', content: introText }
         ];
 
-        // 显示到对话框
         this.appendToDialog(`NPC: ${introText}`);
     }
 
     appendToDialog(text, isPlayer = false) {
-        // 如果对话框尚未初始化，延迟执行
         if (!this.dialogBox) {
-            setTimeout(() => this.appendToDialog(text), 100);
+            setTimeout(() => this.appendToDialog(text, isPlayer), 100);
             return;
         }
 
         this.dialogBox.dialogues.push(text);
 
-        // 如果当前没有在打字，立即显示最新内容
         if (!this.dialogBox.isTyping) {
             this.dialogBox.dialogueIndex = this.dialogBox.dialogues.length - 1;
             this.dialogBox.showNextDialogue();
         }
     }
 
-    async handlePlayerInput(text) {
-        // 隐藏输入框
-        this.inputBox.setVisible(false);
+    showInput() {
+        this.inputBox.setVisible(true);
+        this.inputBox.activate();
+        this.inputBox.inputText.setText('');
+    }
 
-        // 显示玩家输入到对话框
+    async handlePlayerInput(text) {
+        this.inputBox.setVisible(false);
         this.appendToDialog(`You: ${text}`, true);
 
-        // 处理AI响应
-        const { formalText, trustScore, interestScore, strategy, photoShown } = await processPlayerInput(text, this.currentRound, this.photoShown, this.messageHistory);
+        const { formalText, trustScore, interestScore, strategy, photoShown } =
+            await processPlayerInput(text, this.currentRound, this.photoShown, this.messageHistory);
 
-        // 显示NPC回复到对话框
         this.appendToDialog(`NPC: ${formalText}`);
-
-        // 更新游戏状态
         this.updateGameState(trustScore, interestScore, strategy);
 
-        // 检查是否继续下一轮
         if (++this.currentRound > this.maxRounds) {
             this.triggerEnding();
         } else {
@@ -965,27 +957,7 @@ class JobfairScene extends Phaser.Scene {
         }
     }
 
-    appendToDialog(text, isPlayer = false) {
-        // 使用打字机效果显示新内容
-        const dialogues = this.dialogBox.dialogues;
-        dialogues.push(text);
-
-        // 如果对话框当前没有在打字，则触发显示
-        if (!this.dialogBox.isTyping) {
-            this.dialogBox.dialogueIndex = dialogues.length - 1;
-            this.dialogBox.showNextDialogue();
-        }
-    }
-
-    showInput() {
-        // 显示输入框并重置状态
-        this.inputBox.setVisible(true);
-        this.inputBox.activate();
-        this.inputBox.inputText.setText('');
-    }
-
     updateGameState(trustScore, interestScore, strategy) {
-        // 更新UI状态（此处可以添加更多细节，如更新屏幕上的指标等）
         console.log(`Trust: ${trustScore}, Interest: ${interestScore}, Strategy: ${strategy}`);
     }
 
@@ -994,8 +966,7 @@ class JobfairScene extends Phaser.Scene {
         this.inputBox.destroy();
     }
 }
-    
-}
+
 
 
 
