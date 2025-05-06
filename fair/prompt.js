@@ -33,7 +33,7 @@ Examples:
 
   // 响应长度限制
   const wordLimitInstruction = `
-Please limit your responses to no more than 25 words (approximately 1-2 short sentences).
+Please limit your responses to no more than 50 words.
 Be concise and to the point, while still sounding natural and persuasive.
 `.trim();
 
