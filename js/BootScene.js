@@ -897,7 +897,7 @@ class JobfairScene extends Phaser.Scene {
     }
 
     showNPCIntro() {
-    const introText = "I've been working on an \"urban data platform\", mainly for site selection and traffic analysis. You should be familiar with it, like your MUA projects.";
+    const introText = "Hello, we are XX Global Tech, offering remote jobs with 8000 gold per month. Interested?";
     this.messageHistory = [{ role: 'assistant', content: introText }];
     this.appendToDialog(`Recruiter: ${introText}`);
     }
