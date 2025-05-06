@@ -721,11 +721,50 @@ class CoffeeScene extends Phaser.Scene {
         this.showNPCIntro();
     }
 
-    showNPCIntro() {
-        const introText = "I've been working on an 'urban data platform', mainly for site selection and traffic analysis. You should be familiar with it, like your MUA projects.";
-        this.messageHistory = [{ role: 'assistant', content: introText }];
-        this.appendToDialog(`Samuel Chan: ${introText}`);
+     createDialogSystem() {
+        const screenWidth = this.cameras.main.width;
+        const screenHeight = this.cameras.main.height;
+
+        this.dialogBox = new DialogBox(this, {
+            x: screenWidth * 0.025,
+            y: screenHeight - 170,
+            width: screenWidth * 0.95,
+            height: 150,
+            portraitKey: 'npc_jobfair_smile',
+            dialogues: [],
+            onComplete: () => this.showInput()
+        });
+
+        this.inputBox = new InputBox(this, {
+            x: screenWidth * 0.025,
+            y: screenHeight - 200,
+            width: screenWidth * 0.95,
+            onSubmit: text => this.handlePlayerInput(text)
+        });
+        this.inputBox.setVisible(false);
     }
+
+    const firstDialogues = [
+        "[Samuel Chan · MUA Alumni]:",
+        "Hey, I just launched a new urban tech project.",
+        "We met at a lecture before.",
+        "I'm at Literary Café now,",
+        "want to chat?",
+    ];
+
+    // 连接这三句话，中间用换行符分隔
+    const combinedDialogues = firstDialogues.join("\n");
+
+    // 显示合并后的对话
+    this.appendToDialog(combinedDialogues);
+    }
+    
+    showNPCIntro() {
+        const introText = "I've been working on an \"urban data platform\", mainly for site selection and traffic analysis. You should be familiar with it, like your MUA projects.";
+        this.messageHistory = [{ role: 'assistant', content: introText }];
+        this.appendToDialog(`NPC: ${introText}`);
+    }
+
 
     appendToDialog(text, isPlayer = false) {
         if (!this.dialogBox) {
@@ -740,25 +779,7 @@ class CoffeeScene extends Phaser.Scene {
         }
     }
 
-    createDialogSystem() {
-        this.dialogBox = new DialogBox(this, {
-            x: 50,
-            y: this.cameras.main.height - 200,
-            width: this.cameras.main.width - 100,
-            height: 150,
-            portraitKey: 'npc_coffee_smile',
-            dialogues: [],
-            onComplete: () => this.showInput()
-        });
-
-        this.inputBox = new InputBox(this, {
-            x: 50,
-            y: this.cameras.main.height - 50,
-            width: 400,
-            onSubmit: text => this.handlePlayerInput(text)
-        });
-        this.inputBox.setVisible(false);
-    }
+ 
 
     showInput() {
         this.inputBox.setVisible(true);
@@ -856,17 +877,21 @@ class JobfairScene extends Phaser.Scene {
     }
 
     createDialog() {
-        this.createDialogSystem();
+    this.createDialogSystem();
 
-        const firstDialogues = [
-            "You arrive at a large job fair in the city.",
-            "There are several booths.",
-            "Would you like to take a look?"
-        ];
+    const firstDialogues = [
+        "You arrive at a large job fair in the city.",
+        "There are several booths.",
+        "Would you like to take a look?"
+    ];
 
-        firstDialogues.forEach(dialogue => this.appendToDialog(dialogue));
+    // 连接这三句话，中间用换行符分隔
+    const combinedDialogues = firstDialogues.join("\n");
+
+    // 显示合并后的对话
+    this.appendToDialog(combinedDialogues);
     }
-
+    
     showNPCIntro() {
         const introText = "Hello, we are Vantex Global Tech Remote Job, offering remote jobs with 8000 gold per month. Interested?";
         this.messageHistory = [{ role: 'assistant', content: introText }];
