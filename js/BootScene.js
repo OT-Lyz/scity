@@ -678,12 +678,15 @@ class MapScene extends Phaser.Scene {
     
 }
 
+// 顶部统一导入两个函数
+import { processPlayerInput as processPlayerInputCoffee } from '../scripts/utils/dialogueEngine.js';
+import { processPlayerInput as processPlayerInputJobfair } from '../fair/utils/dialogueEngine.js';
+
 class CoffeeScene extends Phaser.Scene {
-    import { processPlayerInput } from '../scripts/utils/dialogueEngine.js';
     constructor() {
         super('CoffeeScene');
         this.currentRound = 1;
-        this.maxRounds = 8;
+        this.maxRounds = 5;
         this.photoShown = false;
         this.messageHistory = [];
     }
@@ -692,11 +695,9 @@ class CoffeeScene extends Phaser.Scene {
         const centerX = this.cameras.main.centerX;
         const centerY = this.cameras.main.centerY;
 
-        // 获取画布的宽度和高度
         const canvasWidth = this.cameras.main.width;
         const canvasHeight = this.cameras.main.height;
 
-        // 初始化公共组件
         this.moneyDisplay = new MoneyDisplay(this);
         this.phoneIcon = new PhoneIcon(this, () => this.togglePhoneInterface());
         this.mapIcon = new MapIcon(this, () => this.scene.start('MapScene'));
@@ -708,7 +709,6 @@ class CoffeeScene extends Phaser.Scene {
         let coffeeSound = this.sound.add('coffeeSound', { loop: true, volume: 0.5 });
         coffeeSound.play();
 
-        // 显示地图背景
         const coffeeImage = this.add.image(centerX, centerY, 'coffee').setOrigin(0.5, 0.5);
         const availableWidth = this.cameras.main.width * 0.99;
         const availableHeight = this.cameras.main.height * 0.99;
@@ -717,35 +717,23 @@ class CoffeeScene extends Phaser.Scene {
         const scaleFactor = Math.min(scaleX, scaleY);
         coffeeImage.setScale(scaleFactor);
 
-        // 创建对话框系统
         this.createDialogSystem();
-
-        // 显示初始NPC对话
         this.showNPCIntro();
     }
 
     showNPCIntro() {
         const introText = "I've been working on an 'urban data platform', mainly for site selection and traffic analysis. You should be familiar with it, like your MUA projects.";
-
-        // 初始化消息历史
-        this.messageHistory = [
-            { role: 'assistant', content: introText }
-        ];
-
-        // 显示到对话框
+        this.messageHistory = [{ role: 'assistant', content: introText }];
         this.appendToDialog(`Samuel Chan: ${introText}`);
     }
 
     appendToDialog(text, isPlayer = false) {
-        // 如果对话框尚未初始化，延迟执行
         if (!this.dialogBox) {
             setTimeout(() => this.appendToDialog(text), 100);
             return;
         }
 
         this.dialogBox.dialogues.push(text);
-
-        // 如果当前没有在打字，立即显示最新内容
         if (!this.dialogBox.isTyping) {
             this.dialogBox.dialogueIndex = this.dialogBox.dialogues.length - 1;
             this.dialogBox.showNextDialogue();
@@ -753,18 +741,16 @@ class CoffeeScene extends Phaser.Scene {
     }
 
     createDialogSystem() {
-        // 创建对话框（位置根据需求调整）
         this.dialogBox = new DialogBox(this, {
             x: 50,
             y: this.cameras.main.height - 200,
             width: this.cameras.main.width - 100,
             height: 150,
             portraitKey: 'npc_coffee_smile',
-            dialogues: [], // 初始为空，动态添加内容
+            dialogues: [],
             onComplete: () => this.showInput()
         });
 
-        // 创建输入框（初始隐藏）
         this.inputBox = new InputBox(this, {
             x: 50,
             y: this.cameras.main.height - 50,
@@ -774,23 +760,22 @@ class CoffeeScene extends Phaser.Scene {
         this.inputBox.setVisible(false);
     }
 
-    async handlePlayerInput(text) {
-        // 隐藏输入框
-        this.inputBox.setVisible(false);
+    showInput() {
+        this.inputBox.setVisible(true);
+        this.inputBox.activate();
+        this.inputBox.inputText.setText('');
+    }
 
-        // 显示玩家输入到对话框
+    async handlePlayerInput(text) {
+        this.inputBox.setVisible(false);
         this.appendToDialog(`You: ${text}`, true);
 
-        // 处理AI响应
-        const { formalText, trustScore, interestScore, strategy, photoShown } = await processPlayerInput(text, this.currentRound, this.photoShown, this.messageHistory);
+        const { formalText, trustScore, interestScore, strategy, photoShown } =
+            await processPlayerInputCoffee(text, this.currentRound, this.photoShown, this.messageHistory);
 
-        // 显示NPC回复到对话框
         this.appendToDialog(`Samuel Chan: ${formalText}`);
-
-        // 更新游戏状态
         this.updateGameState(trustScore, interestScore, strategy);
 
-        // 检查是否继续下一轮
         if (++this.currentRound > this.maxRounds) {
             this.triggerEnding();
         } else {
@@ -798,27 +783,7 @@ class CoffeeScene extends Phaser.Scene {
         }
     }
 
-    appendToDialog(text, isPlayer = false) {
-        // 使用打字机效果显示新内容
-        const dialogues = this.dialogBox.dialogues;
-        dialogues.push(text);
-
-        // 如果对话框当前没有在打字，则触发显示
-        if (!this.dialogBox.isTyping) {
-            this.dialogBox.dialogueIndex = dialogues.length - 1;
-            this.dialogBox.showNextDialogue();
-        }
-    }
-
-    showInput() {
-        // 显示输入框并重置状态
-        this.inputBox.setVisible(true);
-        this.inputBox.activate();
-        this.inputBox.inputText.setText('');
-    }
-
     updateGameState(trustScore, interestScore, strategy) {
-        // 更新UI状态（此处可以添加更多细节，如更新屏幕上的指标等）
         console.log(`Trust: ${trustScore}, Interest: ${interestScore}, Strategy: ${strategy}`);
     }
 
@@ -828,11 +793,7 @@ class CoffeeScene extends Phaser.Scene {
     }
 }
 
-export default CoffeeScene;
-
-
 class JobfairScene extends Phaser.Scene {
-    import { processPlayerInput1 } from '../fair/utils/dialogueEngine.js';
     constructor() {
         super('JobfairScene');
         this.currentRound = 1;
@@ -848,7 +809,6 @@ class JobfairScene extends Phaser.Scene {
         const canvasWidth = this.cameras.main.width;
         const canvasHeight = this.cameras.main.height;
 
-        // 初始化公共组件
         this.moneyDisplay = new MoneyDisplay(this);
         this.phoneIcon = new PhoneIcon(this, () => this.togglePhoneInterface());
         this.mapIcon = new MapIcon(this, () => this.scene.start('MapScene'));
@@ -860,16 +820,14 @@ class JobfairScene extends Phaser.Scene {
         let jobfairSound = this.sound.add('jobfairSound', { loop: true, volume: 0.5 });
         jobfairSound.play();
 
-        // 显示地图背景
-        const JobfairImage = this.add.image(centerX, centerY, 'jobfair').setOrigin(0.5, 0.5);
+        const jobfairImage = this.add.image(centerX, centerY, 'jobfair').setOrigin(0.5, 0.5);
         const availableWidth = this.cameras.main.width * 0.99;
         const availableHeight = this.cameras.main.height * 0.99;
-        const scaleX = availableWidth / JobfairImage.width;
-        const scaleY = availableHeight / JobfairImage.height;
+        const scaleX = availableWidth / jobfairImage.width;
+        const scaleY = availableHeight / jobfairImage.height;
         const scaleFactor = Math.min(scaleX, scaleY);
-        JobfairImage.setScale(scaleFactor);
+        jobfairImage.setScale(scaleFactor);
 
-        // 初始化对话
         this.createDialog();
         this.showNPCIntro();
     }
@@ -878,7 +836,6 @@ class JobfairScene extends Phaser.Scene {
         const screenWidth = this.cameras.main.width;
         const screenHeight = this.cameras.main.height;
 
-        // 创建对话框
         this.dialogBox = new DialogBox(this, {
             x: screenWidth * 0.025,
             y: screenHeight - 170,
@@ -889,7 +846,6 @@ class JobfairScene extends Phaser.Scene {
             onComplete: () => this.showInput()
         });
 
-        // 创建输入框（初始隐藏）
         this.inputBox = new InputBox(this, {
             x: screenWidth * 0.025,
             y: screenHeight - 200,
@@ -913,11 +869,7 @@ class JobfairScene extends Phaser.Scene {
 
     showNPCIntro() {
         const introText = "Hello, we are Vantex Global Tech Remote Job, offering remote jobs with 8000 gold per month. Interested?";
-
-        this.messageHistory = [
-            { role: 'assistant', content: introText }
-        ];
-
+        this.messageHistory = [{ role: 'assistant', content: introText }];
         this.appendToDialog(`NPC: ${introText}`);
     }
 
@@ -928,7 +880,6 @@ class JobfairScene extends Phaser.Scene {
         }
 
         this.dialogBox.dialogues.push(text);
-
         if (!this.dialogBox.isTyping) {
             this.dialogBox.dialogueIndex = this.dialogBox.dialogues.length - 1;
             this.dialogBox.showNextDialogue();
@@ -946,7 +897,7 @@ class JobfairScene extends Phaser.Scene {
         this.appendToDialog(`You: ${text}`, true);
 
         const { formalText, trustScore, interestScore, strategy, photoShown } =
-            await processPlayerInput(text, this.currentRound, this.photoShown, this.messageHistory);
+            await processPlayerInputJobfair(text, this.currentRound, this.photoShown, this.messageHistory);
 
         this.appendToDialog(`NPC: ${formalText}`);
         this.updateGameState(trustScore, interestScore, strategy);
@@ -967,6 +918,9 @@ class JobfairScene extends Phaser.Scene {
         this.inputBox.destroy();
     }
 }
+
+export { CoffeeScene, JobfairScene };
+
 
 
 
