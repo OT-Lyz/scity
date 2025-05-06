@@ -1,6 +1,6 @@
 import { API_KEY, API_URL } from '../config.js';
 
-const MODEL_NAME = 'qwen-turbo-latest';  
+const MODEL_NAME = 'qwen-plus-latest';  
 const MAX_CONTEXT = 4096;
 const MIN_TOKENS = 256;
 
