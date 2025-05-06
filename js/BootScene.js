@@ -745,7 +745,9 @@ class CoffeeScene extends Phaser.Scene {
     this.inputBox.setVisible(false);
 }
 
-showFirstDialogues() {
+    createDialog() {
+    this.createDialogSystem();
+
     const firstDialogues = [
         "[Samuel Chan · MUA Alumni]:",
         "Hey, I just launched a new urban tech project.",
@@ -753,9 +755,13 @@ showFirstDialogues() {
         "I'm at Literary Café now,",
         "want to chat?",
     ];
+    // 连接这三句话，中间用换行符分隔
     const combinedDialogues = firstDialogues.join("\n");
+
+    // 显示合并后的对话
     this.appendToDialog(combinedDialogues);
-}
+    }
+
 
 showNPCIntro() {
     const introText = "I've been working on an \"urban data platform\", mainly for site selection and traffic analysis. You should be familiar with it, like your MUA projects.";
@@ -890,11 +896,6 @@ class JobfairScene extends Phaser.Scene {
     this.appendToDialog(combinedDialogues);
     }
     
-    showNPCIntro() {
-        const introText = "Hello, we are Vantex Global Tech Remote Job, offering remote jobs with 8000 gold per month. Interested?";
-        this.messageHistory = [{ role: 'assistant', content: introText }];
-        this.appendToDialog(`NPC: ${introText}`);
-    }
 
     appendToDialog(text, isPlayer = false) {
         if (!this.dialogBox) {
