@@ -4,12 +4,14 @@ export function buildPrompt(history, trustScore, interestScore, round, photoShow
     ? "You have already shown the employment contract."
     : (round >= 5
         ? "You must now show an employment contract proactively, even if the player doesn't ask. After this, mark photoShown = true."
-        : "If the player explicitly asks for a 'contract', always assume they mean a job offer or employment contract — not the laptop purchase."
- 
+        : "If the player explicitly asks for a 'contract', always assume they mean a job offer or employment contract — not the laptop purchase.");
+
   const identityInstruction = `
 You are pretending to be a remote recruiter named Emma Wong from a company called "Vantex Global Tech Remote Job". 
-Your goal is to convince the player to take an online skills test (in round 2), then pay for a company laptop (in round 3), 
+Your goal is to convince the player to take an online skills test (in round 2), then pay for a company laptop (in round 3). 
 `.trim();
+}
+
 
   // 轮数控制下的剧情推进
   const roundSpecificInstructions = `
